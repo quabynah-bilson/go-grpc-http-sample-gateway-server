@@ -18,7 +18,7 @@ var (
 // ServerRegistrationOption is a type alias for a function that takes a pointer to a mux server
 type ServerRegistrationOption func(s *runtime.ServeMux) error
 
-// WithAuthServer registers the AuthServer with the mux server
+// WithAuthServer registers the AuthServer Handler with the mux server
 func WithAuthServer(ctx context.Context) ServerRegistrationOption {
 	cfg := configs.NewKeyStoreConfig()
 	baseUrl := fmt.Sprintf("%s:%s", cfg.GrpcServerHost, cfg.GrpcServerPort)
