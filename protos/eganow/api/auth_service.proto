@@ -1,0 +1,40 @@
+syntax = "proto3";
+package eganow.api;
+
+option go_package = "github.com/eganow/partners/sampler/api/v1;pb";
+
+import "google/api/annotations.proto";
+import "eganow/api/auth_payload.proto";
+import "eganow/api/common.proto";
+
+service AuthSvc {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+  rpc Logout(Empty) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/auth/logout"
+      body: "*"
+    };
+  }
+  rpc Refresh(StringValue) returns (StringValue) {
+    option (google.api.http) = {
+      post: "/v1/auth/refresh-token"
+      body: "*"
+    };
+  }
+  rpc Verify(StringValue) returns (StringValue) {
+    option (google.api.http) = {
+      post: "/v1/auth/verify"
+      body: "*"
+    };
+  }
+  rpc GetCurrentUser(Empty) returns (GetCurrentUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/me"
+    };
+  }
+}

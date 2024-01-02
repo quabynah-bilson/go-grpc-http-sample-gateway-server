@@ -1,0 +1,14 @@
+syntax = "proto3";
+package eganow.api;
+
+option go_package = "github.com/eganow/partners/sampler/api/v1;pb";
+
+import "eganow/api/common.proto";
+
+message Account {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  Timestamp created_at = 5;
+}
