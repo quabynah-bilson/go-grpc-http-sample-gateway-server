@@ -33,7 +33,7 @@ func StartServer(opts ...ServerRegistrationOption) {
 		}
 	}
 
-	// Create HTTP server that listens on port 9900
+	// Create HTTP server that listens on a port and proxies requests to gRPC server endpoint
 	httpMux := http.NewServeMux()
 	httpMux.Handle("/", grpcMux)
 
