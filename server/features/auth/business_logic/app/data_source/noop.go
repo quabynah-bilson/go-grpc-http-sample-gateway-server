@@ -49,7 +49,7 @@ func (ds *NoopDataSource) GetAccountById(id string) (*pb.Account, error) {
 	// execute query
 	var account *pb.Account
 	err := ds.db.QueryRowContext(ctx, "SELECT * FROM dbo.Accounts WHERE Id = $1", id).Scan(&account)
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
@@ -68,7 +68,7 @@ func (ds *NoopDataSource) GetAccountByEmail(email string) (*pb.Account, error) {
 	// execute query
 	var account *pb.Account
 	err := ds.db.QueryRowContext(ctx, "SELECT * FROM dbo.Accounts WHERE Email = $1", email).Scan(&account)
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
@@ -88,7 +88,7 @@ func (ds *NoopDataSource) CreateAccount(account *pb.CreateAccountRequest) (*pb.A
 	var createdAccount *pb.Account
 	err := ds.db.QueryRowContext(ctx, "INSERT INTO dbo.Accounts (Email, Password, Name) VALUES ($1, $2, $3) RETURNING *",
 		account.GetEmail(), account.GetPassword(), account.GetName()).Scan(&createdAccount)
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
