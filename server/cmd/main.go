@@ -10,20 +10,24 @@ import (
 
 // reference: https://github.com/grpc-ecosystem/grpc-gateway?tab=readme-ov-file
 func main() {
+
 	// Initialize dependencies
 	if err := internal.InitializeDependencies(); err != nil {
 		log.Fatalf("failed to initialize dependencies: %v", err)
 	}
 
+	// Close databases
+	defer internal.CloseDatabases()
+
+	// Start gRPC server
+	go grpc.StartServer(
+		grpc.WithAuthServer(), // register AuthServer with gRPC server
+	)
+
 	// Start HTTP server in a goroutine
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go http.StartServer(
+	http.StartServer(
 		http.WithAuthServer(ctx), // register AuthServer with HTTP server
-	)
-
-	// Start gRPC server
-	grpc.StartServer(
-		grpc.WithAuthServer(), // register AuthServer with gRPC server
 	)
 }

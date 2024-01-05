@@ -2,7 +2,7 @@
 
 # variables
 PROTO_PATH=protos
-OUR_DIR=server/proto_gen
+OUR_DIR=server/features/common/proto_gen
 
 # create the gen directory
 mkdir -p "$OUR_DIR"

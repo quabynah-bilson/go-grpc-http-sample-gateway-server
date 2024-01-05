@@ -24,17 +24,21 @@ const (
 	AuthSvc_Refresh_FullMethodName        = "/eganow.api.AuthSvc/Refresh"
 	AuthSvc_Verify_FullMethodName         = "/eganow.api.AuthSvc/Verify"
 	AuthSvc_GetCurrentUser_FullMethodName = "/eganow.api.AuthSvc/GetCurrentUser"
+	AuthSvc_GetAllAccounts_FullMethodName = "/eganow.api.AuthSvc/GetAllAccounts"
+	AuthSvc_CreateAccount_FullMethodName  = "/eganow.api.AuthSvc/CreateAccount"
 )
 
 // AuthSvcClient is the client API for AuthSvc service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthSvcClient interface {
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	Logout(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 	Refresh(ctx context.Context, in *StringValue, opts ...grpc.CallOption) (*StringValue, error)
 	Verify(ctx context.Context, in *StringValue, opts ...grpc.CallOption) (*StringValue, error)
 	GetCurrentUser(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
+	GetAllAccounts(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllAccountsResponse, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 }
 
 type authSvcClient struct {
@@ -45,8 +49,8 @@ func NewAuthSvcClient(cc grpc.ClientConnInterface) AuthSvcClient {
 	return &authSvcClient{cc}
 }
 
-func (c *authSvcClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
-	out := new(LoginResponse)
+func (c *authSvcClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+	out := new(AuthResponse)
 	err := c.cc.Invoke(ctx, AuthSvc_Login_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -90,15 +94,35 @@ func (c *authSvcClient) GetCurrentUser(ctx context.Context, in *Empty, opts ...g
 	return out, nil
 }
 
+func (c *authSvcClient) GetAllAccounts(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllAccountsResponse, error) {
+	out := new(GetAllAccountsResponse)
+	err := c.cc.Invoke(ctx, AuthSvc_GetAllAccounts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authSvcClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+	out := new(AuthResponse)
+	err := c.cc.Invoke(ctx, AuthSvc_CreateAccount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthSvcServer is the server API for AuthSvc service.
 // All implementations must embed UnimplementedAuthSvcServer
 // for forward compatibility
 type AuthSvcServer interface {
-	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	Login(context.Context, *LoginRequest) (*AuthResponse, error)
 	Logout(context.Context, *Empty) (*Empty, error)
 	Refresh(context.Context, *StringValue) (*StringValue, error)
 	Verify(context.Context, *StringValue) (*StringValue, error)
 	GetCurrentUser(context.Context, *Empty) (*GetCurrentUserResponse, error)
+	GetAllAccounts(context.Context, *Empty) (*GetAllAccountsResponse, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*AuthResponse, error)
 	mustEmbedUnimplementedAuthSvcServer()
 }
 
@@ -106,7 +130,7 @@ type AuthSvcServer interface {
 type UnimplementedAuthSvcServer struct {
 }
 
-func (UnimplementedAuthSvcServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+func (UnimplementedAuthSvcServer) Login(context.Context, *LoginRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedAuthSvcServer) Logout(context.Context, *Empty) (*Empty, error) {
@@ -120,6 +144,12 @@ func (UnimplementedAuthSvcServer) Verify(context.Context, *StringValue) (*String
 }
 func (UnimplementedAuthSvcServer) GetCurrentUser(context.Context, *Empty) (*GetCurrentUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCurrentUser not implemented")
+}
+func (UnimplementedAuthSvcServer) GetAllAccounts(context.Context, *Empty) (*GetAllAccountsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllAccounts not implemented")
+}
+func (UnimplementedAuthSvcServer) CreateAccount(context.Context, *CreateAccountRequest) (*AuthResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
 func (UnimplementedAuthSvcServer) mustEmbedUnimplementedAuthSvcServer() {}
 
@@ -224,6 +254,42 @@ func _AuthSvc_GetCurrentUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthSvc_GetAllAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthSvcServer).GetAllAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthSvc_GetAllAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthSvcServer).GetAllAccounts(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthSvc_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthSvcServer).CreateAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthSvc_CreateAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthSvcServer).CreateAccount(ctx, req.(*CreateAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthSvc_ServiceDesc is the grpc.ServiceDesc for AuthSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +316,14 @@ var AuthSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCurrentUser",
 			Handler:    _AuthSvc_GetCurrentUser_Handler,
+		},
+		{
+			MethodName: "GetAllAccounts",
+			Handler:    _AuthSvc_GetAllAccounts_Handler,
+		},
+		{
+			MethodName: "CreateAccount",
+			Handler:    _AuthSvc_CreateAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

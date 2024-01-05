@@ -1,5 +1,5 @@
 # stage 1: build stage
-FROM golang:1.21-alpine3.18 AS builder
+FROM golang:1.21-rc-alpine3.18 AS builder
 
 # optional authors information
 LABEL authors="eganow"
@@ -11,7 +11,7 @@ RUN apk --update add ca-certificates git
 WORKDIR /app
 
 # Copy the code into the container
-COPY . .
+COPY /server .
 
 # Build the application's binary
 RUN go build -o main cmd/main.go

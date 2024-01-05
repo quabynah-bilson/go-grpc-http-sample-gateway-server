@@ -28,6 +28,11 @@ func TestValidators_ValidateEmailAddress(t *testing.T) {
 			expectedErr: utils.ErrInvalidEmailAddress,
 		},
 		{
+			name:        "improper email address",
+			email:       "!2324234@232434.121212",
+			expectedErr: utils.ErrInvalidEmailAddress,
+		},
+		{
 			name:        "invalid email address",
 			email:       "samplerdomain.com",
 			expectedErr: utils.ErrInvalidEmailAddress,

@@ -18,7 +18,10 @@ install-gateway-deps:
 
 build-docker:
 	@echo "building docker image..." && \
-	cd server && \
-	docker buildx build --platform linux/amd64 -t eganowdevteam/sampler-go-grpc-http-gateway-server:latest .
+	docker buildx build --platform linux/amd64 -f server/docker_k8s/Dockerfile -t eganowdevteam/sampler-go-grpc-http-gateway-server:latest .
 
-.PHONY: gen-protos install-gateway-deps build-binary build-docker
+start-sql-server:
+	@echo "starting sql server..." && \
+	docker run -d --name mssql-server -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Password123' -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+
+.PHONY: gen-protos install-gateway-deps build-binary build-docker start-sql-server

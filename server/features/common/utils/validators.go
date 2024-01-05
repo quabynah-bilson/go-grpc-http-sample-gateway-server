@@ -15,10 +15,10 @@ var (
 )
 
 func ValidateEmail(email string) error {
-	emailRegex := `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 	if len(email) == 0 {
 		return ErrNoEmailAddress
 	}
+	emailRegex := `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 	if ok, _ := regexp.MatchString(emailRegex, email); !ok {
 		return ErrInvalidEmailAddress
 	}
@@ -33,6 +33,28 @@ func ValidatePassword(password string) error {
 	}
 	if ok, _ := regexp.MatchString(passwordRegex, password); !ok {
 		return ErrInvalidPassword
+	}
+
+	return nil
+}
+
+func ValidateName(name string) error {
+	if len(name) == 0 {
+		return status.Errorf(codes.InvalidArgument, "name cannot be empty")
+	}
+
+	// must contain only letters and spaces min 2 chars
+	nameRegex := `^[a-zA-Z ]{2,}$`
+	if ok, _ := regexp.MatchString(nameRegex, name); !ok {
+		return status.Errorf(codes.InvalidArgument, "invalid name")
+	}
+
+	return nil
+}
+
+func ValidateId(id string) error {
+	if len(id) == 0 {
+		return status.Errorf(codes.InvalidArgument, "id cannot be empty")
 	}
 
 	return nil

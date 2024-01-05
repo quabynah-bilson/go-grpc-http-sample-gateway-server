@@ -8,7 +8,7 @@ import "eganow/api/auth_payload.proto";
 import "eganow/api/common.proto";
 
 service AuthSvc {
-  rpc Login(LoginRequest) returns (LoginResponse) {
+  rpc Login(LoginRequest) returns (AuthResponse) {
     option (google.api.http) = {
       post: "/v1/auth/login"
       body: "*"
@@ -35,6 +35,17 @@ service AuthSvc {
   rpc GetCurrentUser(Empty) returns (GetCurrentUserResponse) {
     option (google.api.http) = {
       get: "/v1/auth/me"
+    };
+  }
+  rpc GetAllAccounts(Empty) returns (GetAllAccountsResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/accounts"
+    };
+  }
+  rpc CreateAccount(CreateAccountRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/accounts"
+      body: "*"
     };
   }
 }

@@ -22,3 +22,10 @@ func InitializeDependencies() error {
 
 	return err
 }
+
+// CloseDatabases closes all the databases.
+func CloseDatabases() {
+	if AuthInjector != nil && AuthInjector.DB != nil {
+		_ = AuthInjector.DB.Close()
+	}
+}

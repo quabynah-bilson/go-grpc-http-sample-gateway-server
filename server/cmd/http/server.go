@@ -12,7 +12,7 @@ import (
 
 // StartServer starts the HTTP server
 func StartServer(opts ...ServerRegistrationOption) {
-	// Register gRPC server endpoint
+	// Marshal JSON requests using protojson (maintain the naming format of proto messages)
 	jsonOpts := runtime.WithMarshalerOption(
 		runtime.MIMEWildcard,
 		&runtime.JSONPb{
@@ -24,6 +24,8 @@ func StartServer(opts ...ServerRegistrationOption) {
 			},
 		},
 	)
+
+	// Register gRPC server endpoint
 	grpcMux := runtime.NewServeMux(jsonOpts)
 
 	// register gRPC servers
