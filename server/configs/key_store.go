@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -19,17 +20,18 @@ type KeyStoreConfig struct {
 	HttpServerHost string
 
 	// database
-	DbDriver          string
-	DbUser            string
-	DbPassword        string
-	DbHost            string
-	DbPort            string
-	DbName            string
+	DbConnUrl         string
+	dbDriver          string
+	dbUser            string
+	dbPassword        string
+	dbHost            string
+	dbPort            string
+	dbName            string
 	DbConnMaxIdleTime time.Duration
 	DbConnMaxLifetime time.Duration
 	DbMaxOpenConns    int
 	DbMaxIdleConns    int
-	DbSslMode         bool
+	dbSslMode         bool
 }
 
 func NewKeyStoreConfig() KeyStoreConfig {
@@ -38,37 +40,44 @@ func NewKeyStoreConfig() KeyStoreConfig {
 		log.Fatalf("failed to load env vars: %v", err)
 	}
 
-	keyStoreConfig := KeyStoreConfig{
+	cfg := KeyStoreConfig{
 		GrpcServerPort: "50051",
 		GrpcServerHost: "0.0.0.0",
 		HttpServerPort: "9900",
 		HttpServerHost: "0.0.0.0",
-		DbDriver:       os.Getenv("DB_DRIVER"),
-		DbUser:         os.Getenv("DB_USER"),
-		DbPassword:     os.Getenv("DB_PASSWORD"),
-		DbHost:         os.Getenv("DB_HOST"),
-		DbPort:         os.Getenv("DB_PORT"),
-		DbName:         os.Getenv("DB_NAME"),
+		dbDriver:       os.Getenv("DB_DRIVER"),
+		dbUser:         os.Getenv("DB_USER"),
+		dbPassword:     os.Getenv("DB_PASSWORD"),
+		dbHost:         os.Getenv("DB_HOST"),
+		dbPort:         os.Getenv("DB_PORT"),
+		dbName:         os.Getenv("DB_NAME"),
+		DbConnUrl:      os.Getenv("DB_CONN_URL"),
 	}
 
 	if idleTime, err := strconv.Atoi(os.Getenv("DB_CONN_MAX_IDLE_TIME")); err == nil {
-		keyStoreConfig.DbConnMaxIdleTime = time.Second * time.Duration(idleTime)
+		cfg.DbConnMaxIdleTime = time.Second * time.Duration(idleTime)
 	}
 	if lifetime, err := strconv.Atoi(os.Getenv("DB_CONN_MAX_LIFETIME")); err == nil {
-		keyStoreConfig.DbConnMaxLifetime = time.Second * time.Duration(lifetime)
+		cfg.DbConnMaxLifetime = time.Second * time.Duration(lifetime)
 	}
 
 	if maxOpenConns, err := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONNS")); err == nil {
-		keyStoreConfig.DbMaxOpenConns = maxOpenConns
+		cfg.DbMaxOpenConns = maxOpenConns
 	}
 
 	if maxIdleConns, err := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONNS")); err == nil {
-		keyStoreConfig.DbMaxIdleConns = maxIdleConns
+		cfg.DbMaxIdleConns = maxIdleConns
 	}
 
 	if sslMode, err := strconv.ParseBool(os.Getenv("DB_SSL_MODE")); err == nil {
-		keyStoreConfig.DbSslMode = sslMode
+		cfg.dbSslMode = sslMode
 	}
 
-	return keyStoreConfig
+	// create database connection url if not provided
+	if len(cfg.DbConnUrl) == 0 {
+		cfg.DbConnUrl = fmt.Sprintf("%s://%s:%s@%s:%s?database=%s&connection+timeout=30&encrypt=disable&trustservercertificate=%v",
+			cfg.dbDriver, cfg.dbUser, cfg.dbPassword, cfg.dbHost, cfg.dbPort, cfg.dbName, cfg.dbSslMode)
+	}
+
+	return cfg
 }

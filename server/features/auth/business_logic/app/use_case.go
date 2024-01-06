@@ -30,7 +30,7 @@ func (a *AuthUseCase) Login(req *pb.LoginRequest) (*pb.AuthResponse, error) {
 	}
 
 	response := &pb.AuthResponse{
-		Token:        au.GenerateAccessToken(account.GetId()),
+		Token:        account.GetId(),
 		RefreshToken: au.GenerateRefreshToken(account.GetId()),
 	}
 
@@ -54,7 +54,7 @@ func (a *AuthUseCase) CreateNewAccount(req *pb.CreateAccountRequest) (*pb.AuthRe
 	}
 
 	response := &pb.AuthResponse{
-		Token:        au.GenerateAccessToken(account.GetId()),
+		Token:        account.GetId(),
 		RefreshToken: au.GenerateRefreshToken(account.GetId()),
 	}
 

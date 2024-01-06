@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app/data_source/models"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/pkg"
 	pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/eganow/api"
 	"log"
@@ -28,12 +29,22 @@ func (ds *NoopDataSource) GetAllAccounts() ([]*pb.Account, error) {
 	defer cancel()
 
 	// execute query
-	var accounts []*pb.Account
-	err := ds.db.QueryRowContext(ctx, "SELECT * FROM dbo.Accounts ORDER BY Id DESC").Scan(&accounts)
+	rows, err := ds.db.QueryContext(ctx, "select Id, Email, Name, CreatedAt from dbo.Accounts order by Id desc")
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
+
+	accounts := make([]*pb.Account, 0)
+	if rows.Next() {
+		var dbAccount models.DbAccount
+		if err = rows.Scan(&dbAccount.Id, &dbAccount.Email, &dbAccount.Name, &dbAccount.CreatedAt); err != nil {
+			log.Printf("failed to execute query: %v", err)
+			return nil, errors.New("failed to execute query")
+		}
+		accounts = append(accounts, dbAccount.ToProtoAccount())
+	}
+
 	log.Printf("executed query: %+v", accounts)
 
 	return accounts, nil
@@ -47,15 +58,16 @@ func (ds *NoopDataSource) GetAccountById(id string) (*pb.Account, error) {
 	defer cancel()
 
 	// execute query
-	var account *pb.Account
-	err := ds.db.QueryRowContext(ctx, "SELECT * FROM dbo.Accounts WHERE Id = $1", id).Scan(&account)
+	var account models.DbAccount
+	err := ds.db.QueryRowContext(ctx, "select Id, Email, Name, Password from dbo.Accounts where Id = $1", id).
+		Scan(&account.Id, &account.Email, &account.Name, &account.Password)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
 	log.Printf("executed query: %+v", account)
 
-	return account, nil
+	return account.ToProtoAccount(), nil
 }
 
 // GetAccountByEmail returns an account by email.
@@ -65,34 +77,55 @@ func (ds *NoopDataSource) GetAccountByEmail(email string) (*pb.Account, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// execute query
-	var account *pb.Account
-	err := ds.db.QueryRowContext(ctx, "SELECT * FROM dbo.Accounts WHERE Email = $1", email).Scan(&account)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	stmt, err := ds.db.PrepareContext(ctx, "exec get_account_by_email @email")
+	if err != nil {
+		return nil, err
+	}
+	defer func(stmt *sql.Stmt) {
+		_ = stmt.Close()
+	}(stmt)
+
+	var account models.DbAccount
+	if err = stmt.QueryRowContext(ctx, sql.Named("email", email)).
+		Scan(&account.Id, &account.Email, &account.Password, &account.Name, &account.CreatedAt); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
-	log.Printf("executed query: %+v", account)
+	log.Printf("executed query: %v", account)
 
-	return account, nil
+	return account.ToProtoAccount(), nil
 }
 
 // CreateAccount creates a new account.
-func (ds *NoopDataSource) CreateAccount(account *pb.CreateAccountRequest) (*pb.Account, error) {
+func (ds *NoopDataSource) CreateAccount(req *pb.CreateAccountRequest) (*pb.Account, error) {
 	// create a context
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	// create prepared statement
+	stmt, err := ds.db.PrepareContext(ctx, "insert into dbo.Accounts(Email, Password, Name) values (@email, @password, @name)")
+	if err != nil {
+		return nil, err
+	}
+	defer func(stmt *sql.Stmt) {
+		_ = stmt.Close()
+	}(stmt)
+
 	// execute query
-	var createdAccount *pb.Account
-	err := ds.db.QueryRowContext(ctx, "INSERT INTO dbo.Accounts (Email, Password, Name) VALUES ($1, $2, $3) RETURNING *",
-		account.GetEmail(), account.GetPassword(), account.GetName()).Scan(&createdAccount)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if _, err = stmt.ExecContext(ctx, sql.Named("email", req.GetEmail()), sql.Named("password", req.GetPassword()), sql.Named("name", req.GetName())); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		log.Printf("failed to execute query: %v", err)
 		return nil, errors.New("failed to execute query")
 	}
-	log.Printf("executed query: %+v", createdAccount)
 
-	return createdAccount, nil
+	// execute query
+	var createdAccount models.DbAccount
+	if err = ds.db.QueryRowContext(ctx, "select Id, Email, Name from dbo.Accounts where Email = @email", sql.Named("email", req.GetEmail())).
+		Scan(&createdAccount.Id, &createdAccount.Email, &createdAccount.Name); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Printf("failed to execute query: %v", err)
+		return nil, errors.New("failed to execute query")
+	}
+	log.Printf("executed query: %v", createdAccount.ToProtoAccount())
+
+	return createdAccount.ToProtoAccount(), nil
 }
