@@ -87,3 +87,75 @@ func TestValidators_ValidatePassword(t *testing.T) {
 		})
 	}
 }
+
+func TestValidators_ValidateName(t *testing.T) {
+	cases := []struct {
+		name        string
+		nameStr     string
+		expectedErr error
+	}{
+		{
+			name:        "valid name",
+			nameStr:     "Sampler",
+			expectedErr: nil,
+		},
+		{
+			name:        "no name",
+			nameStr:     "",
+			expectedErr: utils.ErrNoName,
+		},
+		{
+			name:        "invalid name",
+			nameStr:     "sampler@2024",
+			expectedErr: utils.ErrInvalidName,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Act
+			result := utils.ValidateName(tc.nameStr)
+
+			// Assert
+			if !errors.Is(tc.expectedErr, result) {
+				t.Errorf("expected: %v, got: %v", tc.expectedErr, result)
+			}
+		})
+	}
+}
+
+func TestValidators_ValidateId(t *testing.T) {
+	cases := []struct {
+		name        string
+		id          string
+		expectedErr error
+	}{
+		{
+			name:        "valid id",
+			id:          "D035C330-B399-4E77-9671-1F3AA80DF075",
+			expectedErr: nil,
+		},
+		{
+			name:        "no id",
+			id:          "",
+			expectedErr: utils.ErrNoId,
+		},
+		{
+			name:        "invalid id",
+			id:          "1234567890@",
+			expectedErr: utils.ErrInvalidId,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Act
+			result := utils.ValidateId(tc.id)
+
+			// Assert
+			if !errors.Is(tc.expectedErr, result) {
+				t.Errorf("expected: %v, got: %v", tc.expectedErr, result)
+			}
+		})
+	}
+}

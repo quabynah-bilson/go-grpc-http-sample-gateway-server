@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"regexp"
@@ -12,6 +13,12 @@ var (
 
 	ErrNoPassword      = status.Errorf(codes.InvalidArgument, "password cannot be empty")
 	ErrInvalidPassword = status.Errorf(codes.InvalidArgument, "password must be at least 8 characters long and may contain at least one special character")
+
+	ErrNoName      = status.Errorf(codes.InvalidArgument, "name cannot be empty")
+	ErrInvalidName = status.Errorf(codes.InvalidArgument, "invalid name")
+
+	ErrNoId      = status.Errorf(codes.InvalidArgument, "id cannot be empty")
+	ErrInvalidId = status.Errorf(codes.InvalidArgument, "invalid id")
 )
 
 func ValidateEmail(email string) error {
@@ -40,13 +47,13 @@ func ValidatePassword(password string) error {
 
 func ValidateName(name string) error {
 	if len(name) == 0 {
-		return status.Errorf(codes.InvalidArgument, "name cannot be empty")
+		return ErrNoName
 	}
 
 	// must contain only letters and spaces min 2 chars
 	nameRegex := `^[a-zA-Z ]{2,}$`
 	if ok, _ := regexp.MatchString(nameRegex, name); !ok {
-		return status.Errorf(codes.InvalidArgument, "invalid name")
+		return ErrInvalidName
 	}
 
 	return nil
@@ -54,7 +61,11 @@ func ValidateName(name string) error {
 
 func ValidateId(id string) error {
 	if len(id) == 0 {
-		return status.Errorf(codes.InvalidArgument, "id cannot be empty")
+		return ErrNoId
+	}
+
+	if _, err := uuid.Parse(id); err != nil {
+		return ErrInvalidId
 	}
 
 	return nil

@@ -1,0 +1,28 @@
+# CI for running tests on GitHub Actions
+
+name: Go CI
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: go build -v ./server/cmd/...
+
+      - name: Test
+        run: go test -v ./server/tests/...
+
+      - name: Coverage
+        run: go test -coverprofile=coverage.out ./server/tests/... && go tool cover -func=coverage.out
