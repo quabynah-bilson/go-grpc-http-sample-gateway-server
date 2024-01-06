@@ -18,7 +18,8 @@ jobs:
         with:
           go-version: '1.21'
 
-      - run: go build -v ./server/cmd/...
+      - run: go build -v ./cmd/...
+        working-directory: ./server
         name: Build
 
       - run: go test -v ./tests/...
