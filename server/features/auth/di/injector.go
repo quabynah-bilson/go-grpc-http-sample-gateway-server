@@ -3,7 +3,6 @@ package di
 import (
 	"context"
 	"database/sql"
-	"github.com/denisenkom/go-mssqldb/azuread"
 	"github.com/eganow/partners/sampler/api/v1/configs"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app/data_source"
@@ -48,7 +47,7 @@ func connectToDatabase(dbChan chan *sql.DB) {
 	cfg := configs.NewKeyStoreConfig()
 
 	// connect to database
-	db, err := sql.Open(azuread.DriverName, cfg.DbConnUrl)
+	db, err := sql.Open(cfg.DbDriver, cfg.DbConnUrl)
 	if err != nil {
 		log.Printf("failed to open database: %v", err)
 		dbChan <- nil
@@ -69,7 +68,6 @@ func connectToDatabase(dbChan chan *sql.DB) {
 		dbChan <- nil
 		return
 	}
-	log.Printf("successfully connected to database server: %+v", db.Stats())
 
 	dbChan <- db
 }

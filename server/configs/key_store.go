@@ -2,6 +2,7 @@ package configs
 
 import (
 	"fmt"
+	"github.com/denisenkom/go-mssqldb/azuread"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ type KeyStoreConfig struct {
 
 	// database
 	DbConnUrl         string
-	dbDriver          string
+	DbDriver          string
 	dbUser            string
 	dbPassword        string
 	dbHost            string
@@ -45,7 +46,7 @@ func NewKeyStoreConfig() KeyStoreConfig {
 		GrpcServerHost: "0.0.0.0",
 		HttpServerPort: "9900",
 		HttpServerHost: "0.0.0.0",
-		dbDriver:       os.Getenv("DB_DRIVER"),
+		DbDriver:       os.Getenv("DB_DRIVER"),
 		dbUser:         os.Getenv("DB_USER"),
 		dbPassword:     os.Getenv("DB_PASSWORD"),
 		dbHost:         os.Getenv("DB_HOST"),
@@ -73,10 +74,15 @@ func NewKeyStoreConfig() KeyStoreConfig {
 		cfg.dbSslMode = sslMode
 	}
 
+	// get database driver
+	if len(cfg.DbDriver) == 0 {
+		cfg.DbDriver = azuread.DriverName
+	}
+
 	// create database connection url if not provided
 	if len(cfg.DbConnUrl) == 0 {
 		cfg.DbConnUrl = fmt.Sprintf("%s://%s:%s@%s:%s?database=%s&connection+timeout=30&encrypt=disable&trustservercertificate=%v",
-			cfg.dbDriver, cfg.dbUser, cfg.dbPassword, cfg.dbHost, cfg.dbPort, cfg.dbName, cfg.dbSslMode)
+			cfg.DbDriver, cfg.dbUser, cfg.dbPassword, cfg.dbHost, cfg.dbPort, cfg.dbName, cfg.dbSslMode)
 	}
 
 	return cfg
