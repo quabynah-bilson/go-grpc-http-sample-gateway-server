@@ -11,7 +11,7 @@ import (
 )
 
 // StartServer starts the gRPC server
-func StartServer(opts ...ServerRegistrationOption) {
+func StartServer(opts ...ServiceRegistrationOption) {
 	srv := grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 	)

@@ -7,11 +7,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ServerRegistrationOption is a type alias for a function that takes a pointer to a gRPC server
-type ServerRegistrationOption func(s *grpc.Server)
+// ServiceRegistrationOption is a type alias for a function that takes a pointer to a gRPC server
+type ServiceRegistrationOption func(s *grpc.Server)
 
 // WithAuthServer registers the AuthServer with the gRPC server
-func WithAuthServer() ServerRegistrationOption {
+func WithAuthServer() ServiceRegistrationOption {
 	return func(s *grpc.Server) {
 		pb.RegisterAuthSvcServer(s, services.NewAuthService(internal.AuthInjector.UseCase))
 	}

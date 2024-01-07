@@ -11,7 +11,7 @@ import (
 )
 
 // StartServer starts the HTTP server
-func StartServer(opts ...ServerRegistrationOption) {
+func StartServer(opts ...ServiceRegistrationOption) {
 	// Marshal JSON requests using protojson (maintain the naming format of proto messages)
 	jsonOpts := runtime.WithMarshalerOption(
 		runtime.MIMEWildcard,
