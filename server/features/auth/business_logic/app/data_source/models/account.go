@@ -15,7 +15,7 @@ type DbAccount struct {
 	CreatedAt time.Time
 }
 
-// ToProtoAccount converts a DbAccount to an Account.
+// ToProtoAccount converts a DbAccount to an pb.Account.
 func (a *DbAccount) ToProtoAccount() *pb.Account {
 	account := &pb.Account{
 		Id:       a.Id.String(),

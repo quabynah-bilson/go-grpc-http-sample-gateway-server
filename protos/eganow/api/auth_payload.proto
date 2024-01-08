@@ -4,7 +4,7 @@ package eganow.api;
 option go_package = "github.com/eganow/partners/sampler/api/v1;pb";
 
 import "google/api/field_behavior.proto";
-import "eganow/api/auth_entity.proto";
+import "eganow/api/common.proto";
 
 message LoginRequest {
   string email = 1 [(google.api.field_behavior) = REQUIRED];
@@ -27,6 +27,14 @@ message CreateAccountRequest {
   string name = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
+message AccountInfo {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  Timestamp created_at = 5;
+}
+
 message GetAllAccountsResponse {
-  repeated Account accounts = 1;
+  repeated AccountInfo accounts = 1;
 }

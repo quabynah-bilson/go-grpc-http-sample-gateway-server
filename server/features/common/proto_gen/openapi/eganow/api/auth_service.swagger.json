@@ -222,7 +222,7 @@
     }
   },
   "definitions": {
-    "apiAccount": {
+    "apiAccountInfo": {
       "type": "object",
       "properties": {
         "id": {
@@ -282,7 +282,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/apiAccount"
+            "$ref": "#/definitions/apiAccountInfo"
           }
         }
       }

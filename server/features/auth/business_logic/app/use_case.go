@@ -61,7 +61,7 @@ func (a *AuthUseCase) CreateNewAccount(req *pb.CreateAccountRequest) (*pb.AuthRe
 	return response, nil
 }
 
-func (a *AuthUseCase) GetAccountById(id string) (*pb.Account, error) {
+func (a *AuthUseCase) GetAccountById(id string) (*pb.AccountInfo, error) {
 	if err := utils.ValidateId(id); err != nil {
 		return nil, err
 	}
@@ -69,6 +69,6 @@ func (a *AuthUseCase) GetAccountById(id string) (*pb.Account, error) {
 	return a.repo.GetAccount(id)
 }
 
-func (a *AuthUseCase) GetAccounts() ([]*pb.Account, error) {
+func (a *AuthUseCase) GetAccounts() ([]*pb.AccountInfo, error) {
 	return a.repo.GetAccounts()
 }

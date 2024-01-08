@@ -6,14 +6,14 @@ import pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/e
 // repository must satisfy.
 type Repository interface {
 	// Login performs login logic.
-	Login(*pb.LoginRequest) (*pb.Account, error)
+	Login(*pb.LoginRequest) (*pb.AccountInfo, error)
 
 	// GetAccounts returns all accounts.
-	GetAccounts() ([]*pb.Account, error)
+	GetAccounts() ([]*pb.AccountInfo, error)
 
 	// GetAccount returns an account by id.
-	GetAccount(string) (*pb.Account, error)
+	GetAccount(string) (*pb.AccountInfo, error)
 
 	// CreateAccount creates a new account.
-	CreateAccount(*pb.CreateAccountRequest) (*pb.Account, error)
+	CreateAccount(*pb.CreateAccountRequest) (*pb.AccountInfo, error)
 }
