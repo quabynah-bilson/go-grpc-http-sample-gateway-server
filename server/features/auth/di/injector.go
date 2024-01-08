@@ -6,7 +6,6 @@ import (
 	"github.com/eganow/partners/sampler/api/v1/configs"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app/data_source"
-	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app/repository"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/pkg"
 	"log"
 	"time"
@@ -34,7 +33,7 @@ func NewAuthInjector() *AuthInjector {
 	injector.DataSource = data_source.NewNoopDataSource(injector.DB)
 
 	// create the repository
-	injector.Repo = repository.NewNoopAuthRepository(injector.DataSource)
+	injector.Repo = app.NewNoopAuthRepository(injector.DataSource)
 
 	// create the use case
 	injector.UseCase = app.NewAuthUseCase(injector.Repo)

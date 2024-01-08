@@ -35,13 +35,13 @@ type KeyStoreConfig struct {
 	dbSslMode         bool
 }
 
-func NewKeyStoreConfig() KeyStoreConfig {
+func NewKeyStoreConfig() *KeyStoreConfig {
 	// load env vars
 	if err := godotenv.Load("./configs/.env"); err != nil {
 		log.Fatalf("failed to load env vars: %v", err)
 	}
 
-	cfg := KeyStoreConfig{
+	cfg := &KeyStoreConfig{
 		GrpcServerPort: "50051",
 		GrpcServerHost: "0.0.0.0",
 		HttpServerPort: "9900",

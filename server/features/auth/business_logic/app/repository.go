@@ -1,4 +1,4 @@
-package repository
+package app
 
 import (
 	"github.com/eganow/partners/sampler/api/v1/features/auth/pkg"
