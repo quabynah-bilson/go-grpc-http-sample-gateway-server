@@ -17,12 +17,14 @@ func LoggingUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.Un
 	log.Printf(`
 ================== gRPC Unary Call ===================
 Method: %v
+Request: %v
 Duration: %v
 Error: %v
 Response: %v
 ======================================================
 `,
 		info.FullMethod,
+		req,
 		time.Since(start),
 		err,
 		h)
@@ -40,12 +42,14 @@ func LoggingStreamInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.
 	log.Printf(`
 ================== gRPC Streaming Call ===================
 Method: %v
+Request: %v
 Duration: %v
 Error: %v
 Response: %v
 ======================================================
 `,
 		info.FullMethod,
+		ss,
 		time.Since(start),
 		err,
 		ss)
