@@ -25,7 +25,7 @@ WORKDIR /app
 
 # Copy the code into the container from builder
 COPY --from=builder /app/main .
-#COPY configs/.env .
+COPY --from=builder /app/configs/.env ./configs/.env
 
 # expose ports
 EXPOSE 9900 50051

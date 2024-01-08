@@ -26,5 +26,5 @@ go.work
 
 bin/
 **/*.iml
-server/docker_k8s/data/
+server/devops/data/
 server/coverage.html

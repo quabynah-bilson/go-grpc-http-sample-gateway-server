@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql-deployment
+  template:
+    metadata:
+      labels:
+        app: mssql-deployment
+    spec:
+      containers:
+        - env:
+            - name: ACCEPT_EULA
+              value: 'Y'
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: SA_PASSWORD
+                  name: mssql
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1433
+          volumeMounts:
+            - mountPath: /var/opt/mssql
+              name: mssql-storage
+          name: mssqldb
+      volumes:
+        - name: mssql-storage
+          persistentVolumeClaim:
+            claimName: mssql-pv-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-deployment
+  template:
+    metadata:
+      labels:
+        app: gateway-deployment
+    spec:
+      containers:
+        - env:
+            - name: DB_CONN_URL
+              value: sqlserver://sa:Password123@localhost:1433?database=sampler_test_db&connection+timeout=30&encrypt=disable&trustservercertificate=true
+            - name: DB_HOST
+              value: localhost
+            - name: DB_PORT
+              value: '1433'
+            - name: DB_USER
+              value: sa
+            - name: DB_PASSWORD
+              value: Password123
+            - name: DB_NAME
+              value: sampler_test_db
+            - name: DB_DRIVER
+              value: sqlserver
+            - name: DB_SSL_MODE
+              value: disable
+            - name: DB_MAX_IDLE_CONNS
+              value: '10'
+            - name: DB_MAX_OPEN_CONNS
+              value: '100'
+            - name: DB_CONN_MAX_LIFETIME
+              value: '30'
+            - name: DB_CONN_MAX_IDLE_TIME
+              value: '5'
+          image: eganowdevteam/sampler-go-grpc-http-gateway-server:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9900
+            - containerPort: 50051
+          name: server
