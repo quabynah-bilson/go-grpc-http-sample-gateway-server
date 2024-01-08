@@ -1,7 +1,8 @@
-package server
+package grpc
 
 import (
 	"fmt"
+	"github.com/eganow/partners/sampler/api/v1/cmd/server"
 	"github.com/eganow/partners/sampler/api/v1/configs"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/services"
 	pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/eganow/api"
@@ -16,7 +17,7 @@ import (
 // GrpcServer is the grpc server
 type GrpcServer struct {
 	srv *grpc.Server
-	GatewayServer
+	server.GatewayServer
 }
 
 // NewGrpcServer returns a new instance of the grpc server
@@ -25,11 +26,14 @@ func NewGrpcServer() *GrpcServer {
 }
 
 // Start starts the grpc server
-func (g *GrpcServer) Start(opts ...ServiceRegistrationOption) error {
+func (g *GrpcServer) Start(opts ...server.ServiceRegistrationOption) error {
 	var err error
 
 	// create the grpc server
-	g.srv = grpc.NewServer()
+	g.srv = grpc.NewServer(
+		grpc.UnaryInterceptor(LoggingUnaryInterceptor),
+		grpc.StreamInterceptor(LoggingStreamInterceptor),
+	)
 
 	// enable reflection
 	reflection.Register(g.srv)
@@ -68,7 +72,7 @@ func (g *GrpcServer) Stop() error {
 }
 
 // WithAuthServer registers the auth service with the grpc server
-func (*GrpcServer) WithAuthServer() ServiceRegistrationOption {
+func (*GrpcServer) WithAuthServer() server.ServiceRegistrationOption {
 	return func(srv *grpc.Server, _ *runtime.ServeMux) error {
 		pb.RegisterAuthSvcServer(srv, services.NewAuthService(internal.AuthInjector.UseCase))
 		return nil

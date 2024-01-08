@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/eganow/partners/sampler/api/v1/cmd/server"
+	"github.com/eganow/partners/sampler/api/v1/cmd/server/grpc"
 	"github.com/eganow/partners/sampler/api/v1/internal"
 	"log"
 )
@@ -28,7 +29,7 @@ func main() {
 // startGrpcServer starts the gRPC server
 func startGrpcServer() {
 	// create the grpc server
-	grpcServer := server.NewGrpcServer()
+	grpcServer := grpc.NewGrpcServer()
 
 	// set up options for service registration(s)
 	opts := []server.ServiceRegistrationOption{
@@ -42,7 +43,7 @@ func startGrpcServer() {
 	}
 
 	// stop the gRPC server when the function returns
-	defer func(grpcServer *server.GrpcServer) {
+	defer func(grpcServer *grpc.GrpcServer) {
 		_ = grpcServer.Stop()
 	}(grpcServer)
 }
