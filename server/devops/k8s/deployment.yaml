@@ -53,7 +53,10 @@ spec:
       containers:
         - env:
             - name: DB_CONN_URL
-              value: sqlserver://sa:Password123@localhost:1433?database=sampler_test_db&connection+timeout=30&encrypt=disable&trustservercertificate=true
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONN_URL
+                  name: mssql
             - name: DB_HOST
               value: localhost
             - name: DB_PORT
@@ -61,7 +64,10 @@ spec:
             - name: DB_USER
               value: sa
             - name: DB_PASSWORD
-              value: Password123
+              valueFrom:
+                secretKeyRef:
+                  key: SA_PASSWORD
+                  name: mssql
             - name: DB_NAME
               value: sampler_test_db
             - name: DB_DRIVER
