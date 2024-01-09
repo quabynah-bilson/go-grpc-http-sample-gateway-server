@@ -69,7 +69,7 @@ spec:
                   key: SA_PASSWORD
                   name: mssql
             - name: DB_NAME
-              value: sampler_test_db
+              value: master
             - name: DB_DRIVER
               value: sqlserver
             - name: DB_SSL_MODE

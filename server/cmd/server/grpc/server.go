@@ -3,6 +3,7 @@ package grpc
 import (
 	"fmt"
 	"github.com/eganow/partners/sampler/api/v1/cmd/server"
+	"github.com/eganow/partners/sampler/api/v1/cmd/server/grpc/interceptor"
 	"github.com/eganow/partners/sampler/api/v1/configs"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/services"
 	pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/eganow/api"
@@ -31,8 +32,8 @@ func (g *GrpcServer) Start(opts ...server.ServiceRegistrationOption) error {
 
 	// create the grpc server
 	g.srv = grpc.NewServer(
-		grpc.UnaryInterceptor(LoggingUnaryInterceptor),
-		grpc.StreamInterceptor(LoggingStreamInterceptor),
+		grpc.UnaryInterceptor(interceptor.LoggingUnaryInterceptor),
+		grpc.StreamInterceptor(interceptor.LoggingStreamInterceptor),
 	)
 
 	// enable reflection

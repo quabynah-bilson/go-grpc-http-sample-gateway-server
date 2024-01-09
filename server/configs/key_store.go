@@ -58,6 +58,7 @@ func NewKeyStoreConfig() *KeyStoreConfig {
 	if idleTime, err := strconv.Atoi(os.Getenv("DB_CONN_MAX_IDLE_TIME")); err == nil {
 		cfg.DbConnMaxIdleTime = time.Second * time.Duration(idleTime)
 	}
+
 	if lifetime, err := strconv.Atoi(os.Getenv("DB_CONN_MAX_LIFETIME")); err == nil {
 		cfg.DbConnMaxLifetime = time.Second * time.Duration(lifetime)
 	}
