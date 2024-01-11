@@ -38,7 +38,7 @@ func startGrpcServer() {
 	}
 
 	// stop the gRPC server when the function returns
-	defer func(grpcServer *grpc.GrpcServer) {
+	defer func(grpcServer *grpc.GatewayGrpcServer) {
 		_ = grpcServer.Stop()
 	}(grpcServer)
 

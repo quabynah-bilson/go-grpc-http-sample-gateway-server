@@ -15,19 +15,19 @@ import (
 	"net"
 )
 
-// GrpcServer is the grpc server
-type GrpcServer struct {
+// GatewayGrpcServer is the grpc server
+type GatewayGrpcServer struct {
 	srv *grpc.Server
 	server.GatewayServer
 }
 
 // NewGrpcServer returns a new instance of the grpc server
-func NewGrpcServer() *GrpcServer {
-	return &GrpcServer{}
+func NewGrpcServer() *GatewayGrpcServer {
+	return &GatewayGrpcServer{}
 }
 
 // Start starts the grpc server
-func (g *GrpcServer) Start(opts ...server.ServiceRegistrationOption) error {
+func (g *GatewayGrpcServer) Start(opts ...server.ServiceRegistrationOption) error {
 	var err error
 
 	// create the grpc server
@@ -66,14 +66,14 @@ func (g *GrpcServer) Start(opts ...server.ServiceRegistrationOption) error {
 }
 
 // Stop stops the grpc server
-func (g *GrpcServer) Stop() error {
+func (g *GatewayGrpcServer) Stop() error {
 	log.Println("Stopping gRPC server")
 	g.srv.GracefulStop()
 	return nil
 }
 
 // WithAuthServer registers the auth service with the grpc server
-func (*GrpcServer) WithAuthServer() server.ServiceRegistrationOption {
+func (*GatewayGrpcServer) WithAuthServer() server.ServiceRegistrationOption {
 	return func(srv *grpc.Server, _ *runtime.ServeMux) error {
 		pb.RegisterAuthSvcServer(srv, services.NewAuthService(internal.AuthInjector.UseCase))
 		return nil
