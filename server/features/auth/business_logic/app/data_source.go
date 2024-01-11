@@ -1,10 +1,9 @@
-package data_source
+package app
 
 import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/eganow/partners/sampler/api/v1/features/auth/business_logic/app/data_source/models"
 	"github.com/eganow/partners/sampler/api/v1/features/auth/pkg"
 	pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/eganow/api"
 	"google.golang.org/grpc/codes"
@@ -59,7 +58,7 @@ func (ds *NoopDataSource) GetAllAccounts() ([]*pb.Account, error) {
 
 	accounts := make([]*pb.Account, 0)
 	if rows.Next() {
-		var dbAccount models.DbAccount
+		var dbAccount *pb.Account
 		if err = rows.Scan(&dbAccount.Id, &dbAccount.Email, &dbAccount.Name, &dbAccount.CreatedAt); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
@@ -69,7 +68,7 @@ func (ds *NoopDataSource) GetAllAccounts() ([]*pb.Account, error) {
 				return nil, errFailedToExecute
 			}
 		}
-		accounts = append(accounts, dbAccount.ToProtoAccount())
+		accounts = append(accounts, dbAccount)
 	}
 
 	return accounts, nil
@@ -90,7 +89,7 @@ func (ds *NoopDataSource) GetAccountById(id string) (*pb.Account, error) {
 	}
 
 	// execute query
-	var account models.DbAccount
+	var account *pb.Account
 	if err = stmt.QueryRowContext(ctx, id).
 		Scan(&account.Id, &account.Email, &account.Name, &account.Password); err != nil {
 		switch {
@@ -102,7 +101,7 @@ func (ds *NoopDataSource) GetAccountById(id string) (*pb.Account, error) {
 		}
 	}
 
-	return account.ToProtoAccount(), nil
+	return account, nil
 }
 
 // GetAccountByEmail returns an account by email.
@@ -121,7 +120,7 @@ func (ds *NoopDataSource) GetAccountByEmail(email string) (*pb.Account, error) {
 		_ = stmt.Close()
 	}(stmt)
 
-	var account models.DbAccount
+	account := &pb.Account{}
 	if err = stmt.QueryRowContext(ctx, sql.Named("email", email)).
 		Scan(&account.Id, &account.Email, &account.Password, &account.Name, &account.CreatedAt); err != nil {
 		switch {
@@ -133,7 +132,7 @@ func (ds *NoopDataSource) GetAccountByEmail(email string) (*pb.Account, error) {
 		}
 	}
 
-	return account.ToProtoAccount(), nil
+	return account, nil
 }
 
 // CreateAccount creates a new account.
@@ -166,24 +165,24 @@ func (ds *NoopDataSource) CreateAccount(req *pb.CreateAccountRequest) (*pb.Accou
 	}
 
 	// create prepared statement for select
-	stmt, err = ds.db.PrepareContext(ctx, getAccountByEmailQuery)
+	stmt, err = ds.db.PrepareContext(ctx, "select Id, Email, Name from dbo.Accounts where Email = @email")
 	if err != nil {
 		log.Printf("failed to prepare query: %v", err)
 		return nil, errFailedToExecute
 	}
 
 	// execute query
-	var createdAccount models.DbAccount
+	createdAccount := &pb.Account{}
 	if err = stmt.QueryRowContext(ctx, sql.Named("email", req.GetEmail())).
 		Scan(&createdAccount.Id, &createdAccount.Email, &createdAccount.Name); err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return nil, errAccountExists
+			return nil, errAccountNotFound
 		default:
 			log.Printf("failed to execute query: %v", err)
 			return nil, errFailedToExecute
 		}
 	}
 
-	return createdAccount.ToProtoAccount(), nil
+	return createdAccount, nil
 }

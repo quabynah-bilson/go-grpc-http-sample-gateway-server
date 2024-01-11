@@ -1,10 +1,9 @@
 syntax = "proto3";
 package eganow.api;
 
-option go_package = "github.com/eganow/partners/sampler/api/v1;pb";
+option go_package = "github.com/eganow/partners/sampler/api;pb";
 
 import "google/api/field_behavior.proto";
-import "eganow/api/common.proto";
 
 message LoginRequest {
   string email = 1 [(google.api.field_behavior) = REQUIRED];
@@ -27,14 +26,14 @@ message CreateAccountRequest {
   string name = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
-message AccountInfo {
+message AccountInfoResponse {
   string id = 1;
   string name = 2;
   string email = 3;
   string password = 4;
-  Timestamp created_at = 5;
+  string created_at = 5;
 }
 
 message GetAllAccountsResponse {
-  repeated AccountInfo accounts = 1;
+  repeated AccountInfoResponse accounts = 1;
 }

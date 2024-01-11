@@ -20,7 +20,7 @@ func NewNoopAuthRepository(ds pkg.DataSource) pkg.Repository {
 	return &NoopAuthRepository{ds: ds}
 }
 
-func (n *NoopAuthRepository) Login(req *pb.LoginRequest) (*pb.AccountInfo, error) {
+func (n *NoopAuthRepository) Login(req *pb.LoginRequest) (*pb.AccountInfoResponse, error) {
 	account, err := n.ds.GetAccountByEmail(req.GetEmail())
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "failed to get account: %v", err)
@@ -34,7 +34,7 @@ func (n *NoopAuthRepository) Login(req *pb.LoginRequest) (*pb.AccountInfo, error
 	return models.ToAccountInfo(account), nil
 }
 
-func (n *NoopAuthRepository) CreateAccount(req *pb.CreateAccountRequest) (*pb.AccountInfo, error) {
+func (n *NoopAuthRepository) CreateAccount(req *pb.CreateAccountRequest) (*pb.AccountInfoResponse, error) {
 	// encrypt password
 	if hashedPassword, err := utils.EncryptPassword(req.GetPassword()); err != nil {
 		return nil, err
@@ -50,13 +50,13 @@ func (n *NoopAuthRepository) CreateAccount(req *pb.CreateAccountRequest) (*pb.Ac
 	return models.ToAccountInfo(account), nil
 }
 
-func (n *NoopAuthRepository) GetAccounts() ([]*pb.AccountInfo, error) {
+func (n *NoopAuthRepository) GetAccounts() ([]*pb.AccountInfoResponse, error) {
 	accounts, err := n.ds.GetAllAccounts()
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "failed to get accounts: %v", err)
 	}
 
-	var accountInfos []*pb.AccountInfo
+	var accountInfos []*pb.AccountInfoResponse
 	for _, account := range accounts {
 		accountInfos = append(accountInfos, models.ToAccountInfo(account))
 	}
@@ -64,7 +64,7 @@ func (n *NoopAuthRepository) GetAccounts() ([]*pb.AccountInfo, error) {
 	return accountInfos, nil
 }
 
-func (n *NoopAuthRepository) GetAccount(id string) (*pb.AccountInfo, error) {
+func (n *NoopAuthRepository) GetAccount(id string) (*pb.AccountInfoResponse, error) {
 	account, err := n.ds.GetAccountById(id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "failed to get account: %v", err)

@@ -12,11 +12,11 @@ go
 -- create the table in the specified schema
 create table [dbo].[Accounts]
 (
-    [Id]        uniqueidentifier not null primary key default newid(),
-    [Email]     nvarchar(50)     not null unique,
-    [Password]  nvarchar(200)    not null,
-    [Name]      nvarchar(200)    not null,
-    [CreatedAt] DATETIME         not null             default getdate(),
+    [Id]        varchar(100)  not null primary key default newid(),
+    [Email]     nvarchar(50)  not null unique,
+    [Password]  nvarchar(200) not null,
+    [Name]      nvarchar(200) not null,
+    [CreatedAt] DATETIME      not null             default getdate(),
 );
 go
 

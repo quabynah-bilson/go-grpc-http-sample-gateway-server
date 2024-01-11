@@ -26,5 +26,6 @@ go.work
 
 bin/
 **/*.iml
-server/devops/data/
+devops/docker/data/
 server/coverage.html
+sql/*.sql

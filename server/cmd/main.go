@@ -37,15 +37,16 @@ func startGrpcServer() {
 		// @todo: add more services here
 	}
 
+	// stop the gRPC server when the function returns
+	defer func(grpcServer *grpc.GrpcServer) {
+		_ = grpcServer.Stop()
+	}(grpcServer)
+
 	// start the gRPC server
 	if err := grpcServer.Start(opts...); err != nil {
 		log.Fatalf("failed to start grpc server: %v", err)
 	}
 
-	// stop the gRPC server when the function returns
-	defer func(grpcServer *grpc.GrpcServer) {
-		_ = grpcServer.Stop()
-	}(grpcServer)
 }
 
 // startHttpGatewayServer starts the http gateway server
@@ -65,7 +66,9 @@ func startHttpGatewayServer() {
 
 	// stop the http gateway server when the function returns
 	defer func(httpServer *server.HttpGatewayServer) {
-		_ = httpServer.Stop()
+		if err := httpServer.Stop(); err != nil {
+			log.Fatalf("failed to stop http gateway server: %v", err)
+		}
 	}(httpServer)
 
 	// start the http gateway server

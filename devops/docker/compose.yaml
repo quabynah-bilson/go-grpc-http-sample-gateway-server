@@ -23,7 +23,7 @@ services:
     image: eganowdevteam/sampler-go-grpc-http-gateway-server:latest  # The Docker image to use.
     container_name: api-gateway  # The name of the container.
     build: # The build context for the Docker image.
-      context: /server/devops  # The build context directory.
+      context: /devops/docker  # The build context directory.
       dockerfile: Dockerfile  # The Dockerfile to use.
     ports: # The ports to expose.
       - "9900:9900"  # Expose http port 9900.

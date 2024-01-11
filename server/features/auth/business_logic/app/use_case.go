@@ -5,6 +5,7 @@ import (
 	au "github.com/eganow/partners/sampler/api/v1/features/auth/utils"
 	pb "github.com/eganow/partners/sampler/api/v1/features/common/proto_gen/eganow/api"
 	"github.com/eganow/partners/sampler/api/v1/features/common/utils"
+	"log"
 )
 
 // AuthUseCase represents a use case for authentication operations.
@@ -29,8 +30,10 @@ func (a *AuthUseCase) Login(req *pb.LoginRequest) (*pb.AuthResponse, error) {
 		return nil, err
 	}
 
+	log.Printf("account created at: %v", account)
+
 	response := &pb.AuthResponse{
-		Token:        account.GetId(),
+		Token:        account.GetCreatedAt(),
 		RefreshToken: au.GenerateRefreshToken(account.GetId()),
 	}
 
@@ -61,7 +64,7 @@ func (a *AuthUseCase) CreateNewAccount(req *pb.CreateAccountRequest) (*pb.AuthRe
 	return response, nil
 }
 
-func (a *AuthUseCase) GetAccountById(id string) (*pb.AccountInfo, error) {
+func (a *AuthUseCase) GetAccountById(id string) (*pb.AccountInfoResponse, error) {
 	if err := utils.ValidateId(id); err != nil {
 		return nil, err
 	}
@@ -69,6 +72,6 @@ func (a *AuthUseCase) GetAccountById(id string) (*pb.AccountInfo, error) {
 	return a.repo.GetAccount(id)
 }
 
-func (a *AuthUseCase) GetAccounts() ([]*pb.AccountInfo, error) {
+func (a *AuthUseCase) GetAccounts() ([]*pb.AccountInfoResponse, error) {
 	return a.repo.GetAccounts()
 }

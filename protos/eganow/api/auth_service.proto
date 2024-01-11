@@ -1,7 +1,7 @@
 syntax = "proto3";
 package eganow.api;
 
-option go_package = "github.com/eganow/partners/sampler/api/v1;pb";
+option go_package = "github.com/eganow/partners/sampler/api;pb";
 
 import "google/api/annotations.proto";
 import "eganow/api/auth_payload.proto";
