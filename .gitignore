@@ -28,4 +28,4 @@ bin/
 **/*.iml
 devops/docker/data/
 server/coverage.html
-sql/*.sql
+server/database/init.sql
